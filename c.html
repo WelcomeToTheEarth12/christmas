@@ -1,0 +1,206 @@
+<html><head><base href="." />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Christmas Countdowns</title>
+<style>
+body {
+    background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+    font-family: 'Roboto', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.countdown-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 600px;
+    margin: 1rem;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.countdown {
+    display: flex;
+    gap: clamp(0.5rem, 3vw, 2rem);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.time-segment {
+    text-align: center;
+    flex: 1;
+    min-width: 70px;
+}
+
+.time {
+    font-size: clamp(2rem, 7vw, 3.5rem);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.label {
+    font-size: clamp(0.8rem, 3vw, 1rem);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.snowflake {
+    position: fixed;
+    color: white;
+    font-size: clamp(0.8em, 2vw, 1em);
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+    animation: fall linear infinite;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+@media screen and (max-width: 380px) {
+    .countdown {
+        gap: 0.5rem;
+    }
+    
+    .time-segment {
+        min-width: 60px;
+    }
+}
+</style>
+</head>
+<body>
+<div class="countdown-container">
+    <h1>Countdown to Christmas Eve</h1>
+    <div class="countdown">
+        <div class="time-segment">
+            <div class="time" id="days">00</div>
+            <div class="label">Days</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="hours">00</div>
+            <div class="label">Hours</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="minutes">00</div>
+            <div class="label">Minutes</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="seconds">00</div>
+            <div class="label">Seconds</div>
+        </div>
+    </div>
+</div>
+
+<div class="countdown-container">
+    <h1>Countdown to Christmas Break</h1>
+    <div class="countdown">
+        <div class="time-segment">
+            <div class="time" id="break-days">00</div>
+            <div class="label">Days</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="break-hours">00</div>
+            <div class="label">Hours</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="break-minutes">00</div>
+            <div class="label">Minutes</div>
+        </div>
+        <div class="time-segment">
+            <div class="time" id="break-seconds">00</div>
+            <div class="label">Seconds</div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Create snowflakes
+function createSnowflakes() {
+    const numberOfSnowflakes = 50;
+    for (let i = 0; i < numberOfSnowflakes; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.className = 'snowflake';
+        snowflake.innerHTML = '❄';
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = (Math.random() * 5 + 5) + 's';
+        snowflake.style.opacity = Math.random();
+        document.body.appendChild(snowflake);
+    }
+}
+
+createSnowflakes();
+
+// Countdown functionality
+function updateCountdown() {
+    const now = new Date();
+    const christmasEve = new Date(now.getFullYear(), 11, 24); // December 24th
+    const christmasBreak = new Date(now.getFullYear(), 11, 21); // December 21st
+    
+    // If we're past the date, set target to next year
+    if (now > christmasEve) {
+        christmasEve.setFullYear(christmasEve.getFullYear() + 1);
+    }
+    if (now > christmasBreak) {
+        christmasBreak.setFullYear(christmasBreak.getFullYear() + 1);
+    }
+
+    // Convert to Polish timezone (UTC+1)
+    const polishOffset = 1;
+    const utcOffset = -now.getTimezoneOffset() / 60;
+    const offsetDiff = polishOffset - utcOffset;
+    
+    const currentTimePoland = new Date(now.getTime() + offsetDiff * 60 * 60 * 1000);
+    
+    // Calculate Christmas Eve countdown
+    const diffEve = christmasEve - currentTimePoland;
+    const daysEve = Math.floor(diffEve / (1000 * 60 * 60 * 24));
+    const hoursEve = Math.floor((diffEve % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutesEve = Math.floor((diffEve % (1000 * 60 * 60)) / (1000 * 60));
+    const secondsEve = Math.floor((diffEve % (1000 * 60)) / 1000);
+
+    // Calculate Christmas Break countdown
+    const diffBreak = christmasBreak - currentTimePoland;
+    const daysBreak = Math.floor(diffBreak / (1000 * 60 * 60 * 24));
+    const hoursBreak = Math.floor((diffBreak % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutesBreak = Math.floor((diffBreak % (1000 * 60 * 60)) / (1000 * 60));
+    const secondsBreak = Math.floor((diffBreak % (1000 * 60)) / 1000);
+
+    // Update Christmas Eve countdown
+    document.getElementById('days').textContent = String(daysEve).padStart(2, '0');
+    document.getElementById('hours').textContent = String(hoursEve).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutesEve).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(secondsEve).padStart(2, '0');
+
+    // Update Christmas Break countdown
+    document.getElementById('break-days').textContent = String(daysBreak).padStart(2, '0');
+    document.getElementById('break-hours').textContent = String(hoursBreak).padStart(2, '0');
+    document.getElementById('break-minutes').textContent = String(minutesBreak).padStart(2, '0');
+    document.getElementById('break-seconds').textContent = String(secondsBreak).padStart(2, '0');
+}
+
+// Update countdown every second
+setInterval(updateCountdown, 1000);
+updateCountdown(); // Initial call
+</script>
+</body></html>
